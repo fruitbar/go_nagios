@@ -44,6 +44,17 @@ func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 	}
 }
 
+// Construct the Nagios message
+func (status *NagiosStatus) constructedNagiosMessage() string {
+	return valMessages[status.Value] + " " + status.Message
+}
+
+// NagiosStatus: Issue a Nagios message to stdout and exit with appropriate Nagios code
+func (status *NagiosStatus) NagiosExit() {
+	fmt.Fprintln(os.Stdout, status.constructedNagiosMessage())
+	os.Exit(int(status.Value))
+}
+
 // Exit with an UNKNOWN status and appropriate message
 func Unknown(output string) {
 	ExitWithStatus(&NagiosStatus{output, NAGIOS_UNKNOWN})
@@ -64,13 +75,7 @@ func Ok(output string) {
 	ExitWithStatus(&NagiosStatus{output, NAGIOS_OK})
 }
 
-// Construct the Nagios message
-func constructedNagiosMessage(status *NagiosStatus) string {
-	return valMessages[status.Value] + " " + status.Message
-}
-
 // Exit with a particular NagiosStatus
 func ExitWithStatus(status *NagiosStatus) {
-	fmt.Fprintln(os.Stdout, constructedNagiosMessage)
-	os.Exit(int(status.Value))
+	status.NagiosExit()
 }
