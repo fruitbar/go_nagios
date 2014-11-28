@@ -47,3 +47,19 @@ func TestValMessages(t *testing.T) {
 		So(valMessages[NAGIOS_OK], ShouldEqual, "OK:")
 	})
 }
+
+func TestConstructedNagiosMessage(t *testing.T) {
+	Convey("Constructs a Nagios message without performance data", t, func() {
+		status_unknown := &NagiosStatus{"Shrug dunno", NAGIOS_UNKNOWN}
+		So(constructedNagiosMessage(status_unknown), ShouldEqual, "UNKNOWN: Shrug dunno")
+
+		status_critical := &NagiosStatus{"Uh oh", NAGIOS_CRITICAL}
+		So(constructedNagiosMessage(status_critical), ShouldEqual, "CRITICAL: Uh oh")
+
+		status_warning := &NagiosStatus{"Not so bad", NAGIOS_WARNING}
+		So(constructedNagiosMessage(status_warning), ShouldEqual, "WARNING: Not so bad")
+
+		status_ok := &NagiosStatus{"ok", NAGIOS_OK}
+		So(constructedNagiosMessage(status_ok), ShouldEqual, "OK: ok")
+	})
+}

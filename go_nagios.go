@@ -64,8 +64,13 @@ func Ok(output string) {
 	ExitWithStatus(&NagiosStatus{output, NAGIOS_OK})
 }
 
+// Construct the Nagios message
+func constructedNagiosMessage(status *NagiosStatus) string {
+	return valMessages[status.Value] + " " + status.Message
+}
+
 // Exit with a particular NagiosStatus
 func ExitWithStatus(status *NagiosStatus) {
-	fmt.Fprintln(os.Stdout, valMessages[status.Value], status.Message)
+	fmt.Fprintln(os.Stdout, constructedNagiosMessage)
 	os.Exit(int(status.Value))
 }
