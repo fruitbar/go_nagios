@@ -94,7 +94,7 @@ func (status *NagiosStatusWithPerformanceData) constructedNagiosMessage() string
 
 // Issue a Nagios message (with performance data) to stdout and exit with appropriate Nagios code
 func (status *NagiosStatusWithPerformanceData) NagiosExit() {
-	fmt.Fprintln(os.Stdout, status.constructedNagiosMessage)
+	fmt.Fprintln(os.Stdout, status.constructedNagiosMessage())
 	os.Exit(int(status.Value))
 }
 
