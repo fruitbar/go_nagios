@@ -74,7 +74,7 @@ type NagiosPerformanceVal struct {
 // A type representing a Nagios check status and performance data.
 type NagiosStatusWithPerformanceData struct {
 	*NagiosStatus
-	perfdata NagiosPerformanceVal
+	Perfdata NagiosPerformanceVal
 }
 
 // Construct the Nagios message with performance data
@@ -82,13 +82,13 @@ func (status *NagiosStatusWithPerformanceData) constructedNagiosMessage() string
         msg := fmt.Sprintf("%s %s | '%s'=%s%s;%s;%s;%s;%s",
 		valMessages[status.Value],
 		status.Message,
-		status.perfdata.Label,
-		status.perfdata.Value,
-		status.perfdata.Uom,
-		status.perfdata.WarnThreshold,
-		status.perfdata.CritThreshold,
-		status.perfdata.MinValue,
-		status.perfdata.MaxValue)
+		status.Perfdata.Label,
+		status.Perfdata.Value,
+		status.Perfdata.Uom,
+		status.Perfdata.WarnThreshold,
+		status.Perfdata.CritThreshold,
+		status.Perfdata.MinValue,
+		status.Perfdata.MaxValue)
 	return msg
 }
 
