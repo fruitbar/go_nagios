@@ -29,8 +29,9 @@ var (
 // A type representing a Nagios check status. The Value is a the exit code
 // expected for the check and the Message is the specific output string.
 type NagiosStatus struct {
-	Message string
-	Value   NagiosStatusVal
+	Message     string
+	LongMessage string
+	Value       NagiosStatusVal
 }
 
 // Take a bunch of NagiosStatus pointers and find the highest value, then
@@ -61,13 +62,13 @@ func (status *NagiosStatus) NagiosExit() {
 // https://nagios-plugins.org/doc/guidelines.html#AEN200
 // http://docs.pnp4nagios.org/pnp-0.6/about#system_requirements
 type NagiosPerformanceVal struct {
-	Label string
-	Value string
-	Uom string
+	Label         string
+	Value         string
+	Uom           string
 	WarnThreshold string
 	CritThreshold string
-	MinValue string
-	MaxValue string
+	MinValue      string
+	MaxValue      string
 }
 
 //--------------------------------------------------------------
@@ -79,7 +80,7 @@ type NagiosStatusWithPerformanceData struct {
 
 // Construct the Nagios message with performance data
 func (status *NagiosStatusWithPerformanceData) constructedNagiosMessage() string {
-        msg := fmt.Sprintf("%s %s | '%s'=%s%s;%s;%s;%s;%s",
+	msg := fmt.Sprintf("%s %s | '%s'=%s%s;%s;%s;%s;%s\n%s",
 		valMessages[status.Value],
 		status.Message,
 		status.Perfdata.Label,
@@ -88,7 +89,8 @@ func (status *NagiosStatusWithPerformanceData) constructedNagiosMessage() string
 		status.Perfdata.WarnThreshold,
 		status.Perfdata.CritThreshold,
 		status.Perfdata.MinValue,
-		status.Perfdata.MaxValue)
+		status.Perfdata.MaxValue,
+		status.LongMessage)
 	return msg
 }
 
@@ -102,22 +104,22 @@ func (status *NagiosStatusWithPerformanceData) NagiosExit() {
 
 // Exit with an UNKNOWN status and appropriate message
 func Unknown(output string) {
-	ExitWithStatus(&NagiosStatus{output, NAGIOS_UNKNOWN})
+	ExitWithStatus(&NagiosStatus{output, "", NAGIOS_UNKNOWN})
 }
 
 // Exit with an CRITICAL status and appropriate message
 func Critical(err error) {
-	ExitWithStatus(&NagiosStatus{err.Error(), NAGIOS_CRITICAL})
+	ExitWithStatus(&NagiosStatus{err.Error(), "", NAGIOS_CRITICAL})
 }
 
 // Exit with an WARNING status and appropriate message
 func Warning(output string) {
-	ExitWithStatus(&NagiosStatus{output, NAGIOS_WARNING})
+	ExitWithStatus(&NagiosStatus{output, "", NAGIOS_WARNING})
 }
 
 // Exit with an OK status and appropriate message
 func Ok(output string) {
-	ExitWithStatus(&NagiosStatus{output, NAGIOS_OK})
+	ExitWithStatus(&NagiosStatus{output, "", NAGIOS_OK})
 }
 
 // Exit with a particular NagiosStatus
