@@ -35,12 +35,6 @@ type NagiosStatus struct {
 	Perfdata NagiosPerformanceVal
 }
 
-type NagiosStatusLong struct {
-	Message     string
-	Value       NagiosStatusVal
-	LongMessage string
-}
-
 // Take a bunch of NagiosStatus pointers and find the highest value, then
 // combine all the messages. Things win in the order of highest to lowest.
 // Combines messages as well
@@ -69,9 +63,7 @@ func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 		}
 	}
 
-	status.Message = fmt.Sprintf(msgFormat,
-		valMessages[status.Value],
-		"Aggregated status. | \n")
+	status.Message = "Aggregated status. | \n"
 
 	if len(messages) > 0 {
 		status.Message += strings.Join(messages, "\n")
@@ -106,33 +98,33 @@ type NagiosPerformanceVal struct {
 	MaxValue      string
 }
 
-//--------------------------------------------------------------
-// A type representing a Nagios check status and performance data.
-type NagiosStatusWithPerformanceData struct {
-	*NagiosStatus
-	Perfdata NagiosPerformanceVal
-}
+// //--------------------------------------------------------------
+// // A type representing a Nagios check status and performance data.
+// type NagiosStatusWithPerformanceData struct {
+// 	*NagiosStatus
+// 	Perfdata NagiosPerformanceVal
+// }
 
-// Construct the Nagios message with performance data
-func (status *NagiosStatusWithPerformanceData) constructedNagiosMessage() string {
-	msg := fmt.Sprintf("%s %s | '%s'=%s%s;%s;%s;%s;%s",
-		valMessages[status.Value],
-		status.Message,
-		status.Perfdata.Label,
-		status.Perfdata.Value,
-		status.Perfdata.Uom,
-		status.Perfdata.WarnThreshold,
-		status.Perfdata.CritThreshold,
-		status.Perfdata.MinValue,
-		status.Perfdata.MaxValue)
-	return msg
-}
+// // Construct the Nagios message with performance data
+// func (status *NagiosStatusWithPerformanceData) constructedNagiosMessage() string {
+// 	msg := fmt.Sprintf("%s %s | '%s'=%s%s;%s;%s;%s;%s",
+// 		valMessages[status.Value],
+// 		status.Message,
+// 		status.Perfdata.Label,
+// 		status.Perfdata.Value,
+// 		status.Perfdata.Uom,
+// 		status.Perfdata.WarnThreshold,
+// 		status.Perfdata.CritThreshold,
+// 		status.Perfdata.MinValue,
+// 		status.Perfdata.MaxValue)
+// 	return msg
+// }
 
-// Issue a Nagios message (with performance data) to stdout and exit with appropriate Nagios code
-func (status *NagiosStatusWithPerformanceData) NagiosExit() {
-	fmt.Fprintln(os.Stdout, status.constructedNagiosMessage())
-	os.Exit(int(status.Value))
-}
+// // Issue a Nagios message (with performance data) to stdout and exit with appropriate Nagios code
+// func (status *NagiosStatusWithPerformanceData) NagiosExit() {
+// 	fmt.Fprintln(os.Stdout, status.constructedNagiosMessage())
+// 	os.Exit(int(status.Value))
+// }
 
 //--------------------------------------------------------------
 
