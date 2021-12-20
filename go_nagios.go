@@ -47,7 +47,7 @@ func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 	longMessage := ""
 	msg := ""
 	for _, s := range otherStatuses {
-		fmt.Printf("Status: %d Message: %s PerfData: "+perfFormat, s.Value, s.Message,
+		fmt.Printf("Status: %d Message: %s PerfData: "+perfFormat+"\n", s.Value, s.Message,
 			s.Perfdata.Label,
 			s.Perfdata.Value,
 			s.Perfdata.Uom,
