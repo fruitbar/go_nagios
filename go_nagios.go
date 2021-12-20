@@ -82,10 +82,10 @@ func (status *NagiosStatusLong) Aggregate(otherStatuses []*NagiosStatus) {
 	}
 
 	if len(longMessage) > 0 {
-		status.LongMessage = "\n" + strings.Join(longMessage, "\n")
+		status.LongMessage += "\n" + strings.Join(longMessage, "\n")
 	}
 	if len(perfDataString) > 0 {
-		status.LongMessage = " | " + strings.Join(perfDataString, "\n")
+		status.LongMessage += " | " + strings.Join(perfDataString, "\n")
 	}
 }
 
