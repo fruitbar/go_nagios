@@ -3,6 +3,7 @@ package nagios
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 type NagiosStatusVal int
@@ -39,7 +40,10 @@ type NagiosStatus struct {
 // Combines messages as well
 func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 	perfFormat := "'%s'=%s%s;%s;%s;%s;%s"
+	msgFormat := "%s - %s"
+	perfDataStringArr := []string{}
 	perfDataString := ""
+	longMessageArr := []string{}
 	longMessage := ""
 	msg := ""
 	for _, s := range otherStatuses {
@@ -47,7 +51,7 @@ func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 			status.Value = s.Value
 		}
 		if status.Message == "" {
-			msg = fmt.Sprintf("%s - %s | "+perfFormat,
+			msg = fmt.Sprintf(msgFormat+" | "+perfFormat,
 				valMessages[s.Value],
 				s.Message,
 				s.Perfdata.Label,
@@ -58,18 +62,29 @@ func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 				s.Perfdata.MinValue,
 				s.Perfdata.MaxValue)
 		} else {
-			longMessage += s.Message + "\n"
-			perfDataString += fmt.Sprintf(perfFormat+"\n",
+			longMessageArr = append(longMessageArr, fmt.Sprintf("%s - %s",
+				valMessages[s.Value],
+				s.Message))
+			perfDataStringArr = append(perfDataStringArr, fmt.Sprintf(perfFormat,
 				s.Perfdata.Label,
 				s.Perfdata.Value,
 				s.Perfdata.Uom,
 				s.Perfdata.WarnThreshold,
 				s.Perfdata.CritThreshold,
 				s.Perfdata.MinValue,
-				s.Perfdata.MaxValue)
+				s.Perfdata.MaxValue))
 		}
 	}
-	status.Message = msg + " \n " + longMessage + " | " + perfDataString
+	if len(longMessageArr) > 0 {
+		longMessage = strings.Join(longMessageArr, "\n")
+		msg += "\n" + longMessage
+	}
+	if len(perfDataStringArr) > 0 {
+		perfDataString = strings.Join(perfDataStringArr, "\n")
+		msg += " | " + perfDataString
+	}
+	status.Message = msg
+
 }
 
 // Construct the Nagios message
