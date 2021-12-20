@@ -30,16 +30,21 @@ var (
 // A type representing a Nagios check status. The Value is a the exit code
 // expected for the check and the Message is the specific output string.
 type NagiosStatus struct {
+	Message  string
+	Value    NagiosStatusVal
+	Perfdata NagiosPerformanceVal
+}
+
+type NagiosStatusLong struct {
 	Message     string
 	Value       NagiosStatusVal
-	Perfdata    NagiosPerformanceVal
-	LongMessage string ""
+	LongMessage string
 }
 
 // Take a bunch of NagiosStatus pointers and find the highest value, then
 // combine all the messages. Things win in the order of highest to lowest.
 // Combines messages as well
-func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
+func (status *NagiosStatusLong) Aggregate(otherStatuses []*NagiosStatus) {
 	perfFormat := "'%s'=%s%s;%s;%s;%s;%s"
 	msgFormat := "%s %s"
 	perfDataString := []string{}
@@ -141,22 +146,22 @@ func (status *NagiosStatusWithPerformanceData) NagiosExit() {
 
 // Exit with an UNKNOWN status and appropriate message
 func Unknown(output string) {
-	ExitWithStatus(&NagiosStatus{output, NAGIOS_UNKNOWN, NagiosPerformanceVal{}, ""})
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_UNKNOWN, NagiosPerformanceVal{}})
 }
 
 // Exit with an CRITICAL status and appropriate message
 func Critical(err error) {
-	ExitWithStatus(&NagiosStatus{err.Error(), NAGIOS_CRITICAL, NagiosPerformanceVal{}, ""})
+	ExitWithStatus(&NagiosStatus{err.Error(), NAGIOS_CRITICAL, NagiosPerformanceVal{}})
 }
 
 // Exit with an WARNING status and appropriate message
 func Warning(output string) {
-	ExitWithStatus(&NagiosStatus{output, NAGIOS_WARNING, NagiosPerformanceVal{}, ""})
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_WARNING, NagiosPerformanceVal{}})
 }
 
 // Exit with an OK status and appropriate message
 func Ok(output string) {
-	ExitWithStatus(&NagiosStatus{output, NAGIOS_OK, NagiosPerformanceVal{}, ""})
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_OK, NagiosPerformanceVal{}})
 }
 
 // Exit with a particular NagiosStatus
