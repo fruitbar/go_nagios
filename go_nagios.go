@@ -128,22 +128,22 @@ func (status *NagiosStatusWithPerformanceData) NagiosExit() {
 
 // Exit with an UNKNOWN status and appropriate message
 func Unknown(output string) {
-	ExitWithStatus(&NagiosStatus{output, NAGIOS_UNKNOWN})
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_UNKNOWN, NagiosPerformanceVal{}})
 }
 
 // Exit with an CRITICAL status and appropriate message
 func Critical(err error) {
-	ExitWithStatus(&NagiosStatus{err.Error(), NAGIOS_CRITICAL})
+	ExitWithStatus(&NagiosStatus{err.Error(), NAGIOS_CRITICAL, NagiosPerformanceVal{}})
 }
 
 // Exit with an WARNING status and appropriate message
 func Warning(output string) {
-	ExitWithStatus(&NagiosStatus{output, NAGIOS_WARNING})
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_WARNING, NagiosPerformanceVal{}})
 }
 
 // Exit with an OK status and appropriate message
 func Ok(output string) {
-	ExitWithStatus(&NagiosStatus{output, NAGIOS_OK})
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_OK, NagiosPerformanceVal{}})
 }
 
 // Exit with a particular NagiosStatus
