@@ -72,10 +72,10 @@ func (status *NagiosStatusLong) Aggregate(otherStatuses []*NagiosStatus) {
 
 	status.Message = fmt.Sprintf(msgFormat,
 		valMessages[status.Value],
-		"Aggregated status."+perfDataString[0])
+		"Aggregated status. | "+perfDataString[0])
 
 	if len(messages) > 0 {
-		status.LongMessage += "\n" + strings.Join(messages, "\n")
+		status.LongMessage = "\n" + strings.Join(messages, "\n")
 	}
 	if len(perfDataString) > 0 {
 		status.LongMessage += " | " + strings.Join(perfDataString, "\n")
