@@ -39,6 +39,7 @@ type NagiosStatusLong struct {
 	Message     string
 	Value       NagiosStatusVal
 	LongMessage string
+	PerfData    string
 }
 
 // Take a bunch of NagiosStatus pointers and find the highest value, then
@@ -48,28 +49,16 @@ func (status *NagiosStatusLong) Aggregate(otherStatuses []*NagiosStatus) {
 	perfFormat := "'%s'=%s%s;%s;%s;%s;%s"
 	msgFormat := "%s %s"
 	perfDataString := []string{}
-	longMessage := []string{}
+	messages := []string{}
 
 	for _, s := range otherStatuses {
 		if status.Value < s.Value {
 			status.Value = s.Value
-			status.Message = s.Message
 		}
-		if status.Message == "" {
-			status.Message = fmt.Sprintf(msgFormat+" | "+perfFormat,
-				valMessages[s.Value],
-				s.Message,
-				s.Perfdata.Label,
-				s.Perfdata.Value,
-				s.Perfdata.Uom,
-				s.Perfdata.WarnThreshold,
-				s.Perfdata.CritThreshold,
-				s.Perfdata.MinValue,
-				s.Perfdata.MaxValue)
-		} else {
-			longMessage = append(longMessage, fmt.Sprintf(msgFormat,
-				valMessages[s.Value],
-				s.Message))
+		messages = append(messages, fmt.Sprintf(msgFormat,
+			valMessages[s.Value],
+			s.Message))
+		if (NagiosPerformanceVal{}) != s.Perfdata {
 			perfDataString = append(perfDataString, fmt.Sprintf(perfFormat,
 				s.Perfdata.Label,
 				s.Perfdata.Value,
@@ -81,8 +70,12 @@ func (status *NagiosStatusLong) Aggregate(otherStatuses []*NagiosStatus) {
 		}
 	}
 
-	if len(longMessage) > 0 {
-		status.LongMessage += "\n" + strings.Join(longMessage, "\n")
+	status.Message = fmt.Sprintf(msgFormat,
+		valMessages[status.Value],
+		"Aggregated status."+perfDataString[0])
+
+	if len(messages) > 0 {
+		status.LongMessage += "\n" + strings.Join(messages, "\n")
 	}
 	if len(perfDataString) > 0 {
 		status.LongMessage += " | " + strings.Join(perfDataString, "\n")
