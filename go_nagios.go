@@ -29,21 +29,46 @@ var (
 // A type representing a Nagios check status. The Value is a the exit code
 // expected for the check and the Message is the specific output string.
 type NagiosStatus struct {
-	Message     string
-	LongMessage string
-	Value       NagiosStatusVal
+	Message  string
+	Value    NagiosStatusVal
+	Perfdata NagiosPerformanceVal
 }
 
 // Take a bunch of NagiosStatus pointers and find the highest value, then
 // combine all the messages. Things win in the order of highest to lowest.
 func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
+	perfFormat := "'%s'=%s%s;%s;%s;%s;%s"
+	perfDataString := ""
+	longMessage := ""
+	msg := ""
 	for _, s := range otherStatuses {
 		if status.Value < s.Value {
 			status.Value = s.Value
 		}
-
-		status.Message += " - " + s.Message
+		if status.Message == "" {
+			msg = fmt.Sprintf("%s - %s | "+perfFormat,
+				valMessages[s.Value],
+				s.Message,
+				s.Perfdata.Label,
+				s.Perfdata.Value,
+				s.Perfdata.Uom,
+				s.Perfdata.WarnThreshold,
+				s.Perfdata.CritThreshold,
+				s.Perfdata.MinValue,
+				s.Perfdata.MaxValue)
+		} else {
+			longMessage += s.Message + "\n"
+			perfDataString += fmt.Sprintf(perfFormat+"\n",
+				s.Perfdata.Label,
+				s.Perfdata.Value,
+				s.Perfdata.Uom,
+				s.Perfdata.WarnThreshold,
+				s.Perfdata.CritThreshold,
+				s.Perfdata.MinValue,
+				s.Perfdata.MaxValue)
+		}
 	}
+	status.Message = msg + " \n " + longMessage + " | " + perfDataString
 }
 
 // Construct the Nagios message
@@ -80,7 +105,7 @@ type NagiosStatusWithPerformanceData struct {
 
 // Construct the Nagios message with performance data
 func (status *NagiosStatusWithPerformanceData) constructedNagiosMessage() string {
-	msg := fmt.Sprintf("%s %s | '%s'=%s%s;%s;%s;%s;%s\n%s",
+	msg := fmt.Sprintf("%s %s | '%s'=%s%s;%s;%s;%s;%s",
 		valMessages[status.Value],
 		status.Message,
 		status.Perfdata.Label,
@@ -89,8 +114,7 @@ func (status *NagiosStatusWithPerformanceData) constructedNagiosMessage() string
 		status.Perfdata.WarnThreshold,
 		status.Perfdata.CritThreshold,
 		status.Perfdata.MinValue,
-		status.Perfdata.MaxValue,
-		status.LongMessage)
+		status.Perfdata.MaxValue)
 	return msg
 }
 
@@ -104,22 +128,22 @@ func (status *NagiosStatusWithPerformanceData) NagiosExit() {
 
 // Exit with an UNKNOWN status and appropriate message
 func Unknown(output string) {
-	ExitWithStatus(&NagiosStatus{output, "", NAGIOS_UNKNOWN})
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_UNKNOWN})
 }
 
 // Exit with an CRITICAL status and appropriate message
 func Critical(err error) {
-	ExitWithStatus(&NagiosStatus{err.Error(), "", NAGIOS_CRITICAL})
+	ExitWithStatus(&NagiosStatus{err.Error(), NAGIOS_CRITICAL})
 }
 
 // Exit with an WARNING status and appropriate message
 func Warning(output string) {
-	ExitWithStatus(&NagiosStatus{output, "", NAGIOS_WARNING})
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_WARNING})
 }
 
 // Exit with an OK status and appropriate message
 func Ok(output string) {
-	ExitWithStatus(&NagiosStatus{output, "", NAGIOS_OK})
+	ExitWithStatus(&NagiosStatus{output, NAGIOS_OK})
 }
 
 // Exit with a particular NagiosStatus
