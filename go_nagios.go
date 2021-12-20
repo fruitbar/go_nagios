@@ -40,13 +40,21 @@ type NagiosStatus struct {
 // Combines messages as well
 func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 	perfFormat := "'%s'=%s%s;%s;%s;%s;%s"
-	msgFormat := "%s - %s"
+	msgFormat := "%s %s"
 	perfDataStringArr := []string{}
 	perfDataString := ""
 	longMessageArr := []string{}
 	longMessage := ""
 	msg := ""
 	for _, s := range otherStatuses {
+		fmt.Printf("Status: %d Message: %s PerfData: "+perfFormat, s.Value, s.Message,
+			s.Perfdata.Label,
+			s.Perfdata.Value,
+			s.Perfdata.Uom,
+			s.Perfdata.WarnThreshold,
+			s.Perfdata.CritThreshold,
+			s.Perfdata.MinValue,
+			s.Perfdata.MaxValue)
 		if status.Value < s.Value {
 			status.Value = s.Value
 		}
@@ -62,7 +70,7 @@ func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 				s.Perfdata.MinValue,
 				s.Perfdata.MaxValue)
 		} else {
-			longMessageArr = append(longMessageArr, fmt.Sprintf("%s - %s",
+			longMessageArr = append(longMessageArr, fmt.Sprintf(msgFormat,
 				valMessages[s.Value],
 				s.Message))
 			perfDataStringArr = append(perfDataStringArr, fmt.Sprintf(perfFormat,
