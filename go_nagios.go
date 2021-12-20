@@ -39,13 +39,12 @@ type NagiosStatusLong struct {
 	Message     string
 	Value       NagiosStatusVal
 	LongMessage string
-	PerfData    string
 }
 
 // Take a bunch of NagiosStatus pointers and find the highest value, then
 // combine all the messages. Things win in the order of highest to lowest.
 // Combines messages as well
-func (status *NagiosStatusLong) Aggregate(otherStatuses []*NagiosStatus) {
+func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 	perfFormat := "'%s'=%s%s;%s;%s;%s;%s"
 	msgFormat := "%s %s"
 	perfDataString := []string{}
@@ -72,13 +71,13 @@ func (status *NagiosStatusLong) Aggregate(otherStatuses []*NagiosStatus) {
 
 	status.Message = fmt.Sprintf(msgFormat,
 		valMessages[status.Value],
-		"Aggregated status. | "+perfDataString[0])
+		"Aggregated status. | \n")
 
 	if len(messages) > 0 {
-		status.LongMessage = "\n" + strings.Join(messages, "\n")
+		status.Message += strings.Join(messages, "\n")
 	}
 	if len(perfDataString) > 0 {
-		status.LongMessage += " | " + strings.Join(perfDataString, "\n")
+		status.Message += " | " + strings.Join(perfDataString, "\n")
 	}
 }
 
