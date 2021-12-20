@@ -36,6 +36,7 @@ type NagiosStatus struct {
 
 // Take a bunch of NagiosStatus pointers and find the highest value, then
 // combine all the messages. Things win in the order of highest to lowest.
+// Combines messages as well
 func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 	perfFormat := "'%s'=%s%s;%s;%s;%s;%s"
 	perfDataString := ""
