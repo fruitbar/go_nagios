@@ -63,7 +63,7 @@ func (status *NagiosStatus) Aggregate(otherStatuses []*NagiosStatus) {
 		}
 	}
 
-	status.Message = "Aggregated status. | "
+	status.Message = ""
 
 	if len(messages) > 0 {
 		status.Message += "\n" + strings.Join(messages, "\n")
